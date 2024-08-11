@@ -4,6 +4,7 @@ const mongoose = require("mongoose")
 const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
 const {loginModel} = require("./models/admin")
+const { peopleModel } = require("./models/addpeople")
 
 const app = express()
 app.use(cors())
@@ -48,6 +49,23 @@ app.post("/signin",(req,res)=>{
             }
         }
     ).catch()
+})
+
+app.post("/addPeople",(req,res)=>{
+    let input =req.body
+    let token=req.headers.token
+    jwt.verify(token,"rescue-app",(error,decoded)=>{
+        if(decoded && decoded.email)
+        {
+            let result=new peopleModel(input)
+            result.save()
+            res.json({"status":"success"})
+
+        }else
+        {
+            res.json({"status":"Invalid Authentication"}) 
+        }
+    })
 })
 
 app.listen(8080,()=>{
